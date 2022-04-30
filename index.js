@@ -11,13 +11,14 @@ const master = context.createGain();
 master.connect(context.destination);
 
 document.querySelector('#start').addEventListener('click', async ()=>{
-    const STRING = "HALLO HANNAH";
-    for(let letter of STRING.split("")){
-        switch(letter){
-            case " ": letter = "SPACE"
-        }
+    const SETTINGS = getInputSettings();
 
-        const LETTER = LETTERS[letter];
+    for(let letter of SETTINGS.text.split("")){
+
+        // const LETTER = getLetter(letter); // for vertical Text
+        const LETTER = transpose(mirror(getLetter(letter))); // for Horizontal Text
+
+        printLetter(LETTER);
         for(let row = LETTER.length - 1; row >= 0; row--){
             const TONES = [];
             for(let i = 0; i < LETTER[row].length; i++){
@@ -62,3 +63,36 @@ const playFrequency = (frequency, duration) => {
 }
 
 const wait = (time) => new Promise(res=>setTimeout(res,time));
+
+const transpose = (array) => array[0].map((_, colIndex) => array.map(row => row[colIndex]));
+const mirror = (array)  => array.map(row => row.reverse());
+
+const printLetter = (letter) => {
+    let out = ""
+    for(let row of letter){
+        out += row.map(c => c === 0 ? " " : "O").join("")+"\n";
+    }
+    
+    if(out !== "") console.log(out);
+}
+
+const getLetter = (letter) => {
+    let letters = JSON.parse(JSON.stringify(LETTERS)); // hack to copy object
+
+    // translate letters
+    switch(letter){
+        case " ": letter = "SPACE"; break;
+    }
+
+    if(!letters[letter]) letter = "?";
+
+    return letters[letter];
+}
+
+const getInputSettings = () => {
+    return {
+        text: document.querySelector('#input').value
+
+    };
+}
+
