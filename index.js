@@ -1,6 +1,5 @@
 const LENGTH = 400;
 const INTERVAL = 400;
-const BASE = 18000;
 const SLOPE = 0; // for nice sound 0.015
 const THICKNESS = 2;
 const LINE_HEIGHT = 7;
@@ -21,7 +20,7 @@ document.querySelector('#start').addEventListener('click', async ()=>{
             const TONES = [];
             for(let i = 0; i < LETTER[row].length; i++){
                 if(LETTER[row][i] === 1){
-                    const LBASE = LETTER[row].length <= LINE_HEIGHT ? BASE : BASE - (LETTER[row].length - LINE_HEIGHT)*INTERVAL;
+                    const LBASE = LETTER[row].length <= LINE_HEIGHT ? SETTINGS.base : SETTINGS.base - (LETTER[row].length - LINE_HEIGHT)*INTERVAL;
                     TONES.push(LBASE + (INTERVAL * i));
                 }
             }
@@ -92,8 +91,8 @@ const getLetter = (letter) => {
 
 const getInputSettings = () => {
     return {
-        text: document.querySelector('#input').value
-
+        text: document.querySelector('#input').value,
+        base: document.querySelector('#base').value || 18000
     };
 }
 
