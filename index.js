@@ -10,6 +10,7 @@ master.connect(context.destination);
 
 document.querySelector('#start').addEventListener('click', async ()=>{
     const SETTINGS = getInputSettings();
+    console.log(SETTINGS);
 
     for(let letter of Array.from(SETTINGS.text)){
         // const LETTER = getLetter(letter); // for vertical Text
