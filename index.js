@@ -93,7 +93,7 @@ const getLetter = (letter) => {
 const getInputSettings = () => {
     return {
         text: document.querySelector('#input').value,
-        base: document.querySelector('#base').value
+        base: parseInt(document.querySelector('#base').value) || 18000
     };
 }
 
