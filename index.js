@@ -1,9 +1,3 @@
-const LENGTH = 400;
-const INTERVAL = 400;
-const SLOPE = 0; // for nice sound 0.015
-const THICKNESS = 2;
-const LINE_HEIGHT = 7;
-
 const context = new AudioContext();
 const master = context.createGain();
 master.connect(context.destination);
@@ -20,26 +14,26 @@ document.querySelector('#start').addEventListener('click', async () => {
             const TONES = [];
             for (let i = 0; i < LETTER[row].length; i++) {
                 if (LETTER[row][i] === 1) {
-                    const LBASE = LETTER[row].length <= LINE_HEIGHT ? SETTINGS.base : SETTINGS.base - (LETTER[row].length - LINE_HEIGHT) * INTERVAL;
-                    TONES.push(LBASE + (INTERVAL * i));
+                    const LBASE = LETTER[row].length <= SETTINGS.lineHeight ? SETTINGS.base : SETTINGS.base - (LETTER[row].length - SETTINGS.lineHeight) * SETTINGS.interval;
+                    TONES.push(LBASE + (SETTINGS.interval * i));
                 }
             }
 
             let j = 0;
             if (TONES.length > 0) {
-                for (let i = 0; i < TONES.length * THICKNESS; i++) {
-                    const ACTUAL_LENGTH = LENGTH / (TONES.length * THICKNESS);
-                    playFrequency(TONES[j], ACTUAL_LENGTH);
-                    await wait(ACTUAL_LENGTH);
+                for (let i = 0; i < TONES.length * SETTINGS.thickness; i++) {
+                    let actualLength = SETTINGS.length / (TONES.length * SETTINGS.thickness);
+                    playFrequency(TONES[j], actualLength, SETTINGS.slope);
+                    await wait(actualLength);
                     j = j < (TONES.length - 1) ? j + 1 : 0;
                 }
             } else {
-                await wait(LENGTH);
+                await wait(SETTINGS.length);
             }
 
         }
 
-        await wait(LENGTH);
+        await wait(SETTINGS.length);
     }
 
 });
@@ -48,7 +42,7 @@ document.querySelector('#stop').addEventListener('click', () => {
     master.gain.setTargetAtTime(0, context.currentTime, 0.015);
 });
 
-const playFrequency = (frequency, duration) => {
+const playFrequency = (frequency, duration, slope) => {
     const oscillator = context.createOscillator();
     const channel = context.createGain();
     oscillator.frequency.value = frequency;
@@ -57,7 +51,7 @@ const playFrequency = (frequency, duration) => {
 
     oscillator.start(0);
 
-    setTimeout(() => { channel.gain.setTargetAtTime(0, context.currentTime, SLOPE); }, duration);
+    setTimeout(() => { channel.gain.setTargetAtTime(0, context.currentTime, slope); }, duration);
 };
 
 const wait = (time) => new Promise(res => setTimeout(res, time));
@@ -92,7 +86,12 @@ const getLetter = (letter) => {
 const getInputSettings = () => {
     return {
         text: document.querySelector('#input').value,
-        base: parseInt(document.querySelector('#base').value) || 18000
+        base: parseInt(document.querySelector('#base').value) || 18000,
+        length: parseInt(document.querySelector('#length').value) || 400,
+        interval: parseInt(document.querySelector('#interval').value) || 400,
+        slope: parseFloat(document.querySelector('#slope').value) || 0.0, // for nice sound 0.015
+        thickness: parseInt(document.querySelector('#thickness').value) || 2,
+        lineHeight: parseInt(document.querySelector('#lineHeight').value) || 7
     };
 };
 
