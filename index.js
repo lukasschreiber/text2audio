@@ -1,3 +1,5 @@
+var AudioContext = window.AudioContext || window.webkitAudioContext;
+
 const context = new AudioContext();
 const master = context.createGain();
 master.connect(context.destination);
