@@ -1,11 +1,10 @@
 var AudioContext = window.AudioContext || window.webkitAudioContext;
 
-const context = new AudioContext();
-const master = context.createGain();
-master.connect(context.destination);
-
 document.querySelector('#start').addEventListener('click', async () => {
     const SETTINGS = getInputSettings();
+    const context = new AudioContext();
+    const master = context.createGain();
+    master.connect(context.destination);
 
     for (let letter of Array.from(SETTINGS.text)) {
         // const LETTER = getLetter(letter); // for vertical Text
@@ -25,7 +24,7 @@ document.querySelector('#start').addEventListener('click', async () => {
             if (TONES.length > 0) {
                 for (let i = 0; i < TONES.length * SETTINGS.thickness; i++) {
                     let actualLength = SETTINGS.length / (TONES.length * SETTINGS.thickness);
-                    playFrequency(TONES[j], actualLength, SETTINGS.slope);
+                    playFrequency(context, master, TONES[j], actualLength, SETTINGS.slope);
                     await wait(actualLength);
                     j = j < (TONES.length - 1) ? j + 1 : 0;
                 }
@@ -44,7 +43,7 @@ document.querySelector('#stop').addEventListener('click', () => {
     master.gain.setTargetAtTime(0, context.currentTime, 0.015);
 });
 
-const playFrequency = (frequency, duration, slope) => {
+const playFrequency = (context, master, frequency, duration, slope) => {
     const oscillator = context.createOscillator();
     const channel = context.createGain();
     oscillator.frequency.value = frequency;
