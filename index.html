@@ -5,14 +5,14 @@
     </head>
     <body>
         <button id="start">Start</button>
-        <button id="stop">Stop</button>
-        <input type="text" id="input" value="TÖST 🤍 🖤 🤖"/>
-        <input type="number" id="base" value="18000" />
-        <input type="number" id="length" value="400" />
-        <input type="number" id="interval" value="400" />
-        <input type="number" id="slope" value="0.0" />
-        <input type="number" id="thickness" value="2" />
-        <input type="number" id="lineHeight" value="7" />
+        <button id="stop">Stop</button><br />
+        <label for="input">Text</label><input type="text" id="input" value="TÖST 🤍 🖤 🤖"/><br />
+        <label for="base">Basis Frequenz</label><input type="number" id="base" value="18000" /><br />
+        <label for="length">Pixellänge in sec</label><input type="number" id="length" value="0.4" /><br />
+        <label for="interval">Interval between Notes in Hz</label><input type="number" id="interval" value="400" /><br />
+        <label for="slope">Time for gradient at end of note in sec</label><input type="number" id="slope" value="0.0" /><br />
+        <label for="thickness">Number of lines per pixel</label><input type="number" id="thickness" value="2" /><br />
+        <label for="lineHeight">Line Height</label><input type="number" id="lineHeight" value="7" />
         <script src="./index.js"></script>
     </body>
 </html>

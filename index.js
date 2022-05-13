@@ -7,6 +7,7 @@ master.connect(context.destination);
 document.querySelector('#start').addEventListener('click', async () => {
     const SETTINGS = getInputSettings();
 
+    let offset = 0;
     for (let letter of Array.from(SETTINGS.text)) {
         // const LETTER = getLetter(letter); // for vertical Text
         const LETTER = transpose(mirror(getLetter(letter))); // for Horizontal Text
@@ -25,17 +26,17 @@ document.querySelector('#start').addEventListener('click', async () => {
             if (TONES.length > 0) {
                 for (let i = 0; i < TONES.length * SETTINGS.thickness; i++) {
                     let actualLength = SETTINGS.length / (TONES.length * SETTINGS.thickness);
-                    playFrequency(TONES[j], actualLength, SETTINGS.slope);
-                    await wait(actualLength);
+                    playFrequency(TONES[j], offset, actualLength, SETTINGS.slope);
+                    offset += actualLength;
                     j = j < (TONES.length - 1) ? j + 1 : 0;
                 }
             } else {
-                await wait(SETTINGS.length);
+                offset += SETTINGS.length;
             }
 
         }
 
-        await wait(SETTINGS.length);
+        offset += SETTINGS.length;
     }
 
 });
@@ -44,19 +45,22 @@ document.querySelector('#stop').addEventListener('click', () => {
     master.gain.setTargetAtTime(0, context.currentTime, 0.015);
 });
 
-const playFrequency = (frequency, duration, slope) => {
+const playFrequency = (frequency, start, duration, slope) => {
+    duration = Math.floor(duration*frequency)/frequency;
+
     const oscillator = context.createOscillator();
     const channel = context.createGain();
     oscillator.frequency.value = frequency;
     oscillator.connect(channel);
     channel.connect(master);
 
-    oscillator.start(0);
+    oscillator.start(start);
 
-    setTimeout(() => { channel.gain.setTargetAtTime(0, context.currentTime, slope); }, duration);
+    oscillator.stop(start + duration);
+
+
+    // setTimeout(() => { channel.gain.setTargetAtTime(0, context.currentTime, slope); }, duration * 1000);
 };
-
-const wait = (time) => new Promise(res => setTimeout(res, time));
 
 const transpose = (array) => array[0].map((_, colIndex) => array.map(row => row[colIndex]));
 const mirror = (array) => array.map(row => row.reverse());
@@ -89,7 +93,7 @@ const getInputSettings = () => {
     return {
         text: document.querySelector('#input').value,
         base: parseInt(document.querySelector('#base').value) || 18000,
-        length: parseInt(document.querySelector('#length').value) || 400,
+        length: parseFloat(document.querySelector('#length').value) || 0.4,
         interval: parseInt(document.querySelector('#interval').value) || 400,
         slope: parseFloat(document.querySelector('#slope').value) || 0.0, // for nice sound 0.015
         thickness: parseInt(document.querySelector('#thickness').value) || 2,
