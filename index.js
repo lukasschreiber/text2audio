@@ -4,8 +4,10 @@ const context = new AudioContext();
 const master = context.createGain();
 master.connect(context.destination);
 
-document.querySelector('#start').addEventListener('click', async () => {
+document.querySelector('#start').addEventListener('click', async (e) => {
+    e.target.disabled = true;
     const SETTINGS = getInputSettings();
+    master.gain.setValueAtTime(1.0, 0);
 
     let offset = 0;
     for (let letter of Array.from(SETTINGS.text)) {
@@ -39,6 +41,7 @@ document.querySelector('#start').addEventListener('click', async () => {
         offset += SETTINGS.length;
     }
 
+    setTimeout(()=>{e.target.disabled = false}, offset*1000);
 });
 
 document.querySelector('#stop').addEventListener('click', () => {
@@ -54,10 +57,12 @@ const playFrequency = (frequency, start, duration, slope) => {
     oscillator.connect(channel);
     channel.connect(master);
 
+    channel.gain.setValueAtTime(0, start);
+    channel.gain.linearRampToValueAtTime(1.0, start + duration / 200);
+    channel.gain.linearRampToValueAtTime(0.00001, start + duration);
     oscillator.start(start);
 
     oscillator.stop(start + duration);
-
 
     // setTimeout(() => { channel.gain.setTargetAtTime(0, context.currentTime, slope); }, duration * 1000);
 };
