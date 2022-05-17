@@ -28,7 +28,7 @@ document.querySelector('#start').addEventListener('click', async (e) => {
             if (TONES.length > 0) {
                 for (let i = 0; i < TONES.length * SETTINGS.thickness; i++) {
                     let actualLength = SETTINGS.length / (TONES.length * SETTINGS.thickness);
-                    playFrequency(TONES[j], offset, actualLength, SETTINGS.slope);
+                    playFrequency(TONES[j], offset, actualLength, SETTINGS.slope, SETTINGS.supressClick);
                     offset += actualLength;
                     j = j < (TONES.length - 1) ? j + 1 : 0;
                 }
@@ -48,7 +48,12 @@ document.querySelector('#stop').addEventListener('click', () => {
     master.gain.setTargetAtTime(0, context.currentTime, 0.015);
 });
 
-const playFrequency = (frequency, start, duration, slope) => {
+document.querySelector('#test').addEventListener('click', () => {
+    playFrequency(18000, 0, 1, 0);
+});
+
+
+const playFrequency = (frequency, start, duration, slope, supressClick = true) => {
     duration = Math.floor(duration*frequency)/frequency;
 
     const oscillator = context.createOscillator();
@@ -57,9 +62,12 @@ const playFrequency = (frequency, start, duration, slope) => {
     oscillator.connect(channel);
     channel.connect(master);
 
-    channel.gain.setValueAtTime(0, start);
-    channel.gain.linearRampToValueAtTime(1.0, start + duration / 200);
-    channel.gain.linearRampToValueAtTime(0.00001, start + duration);
+    if(supressClick){
+        channel.gain.setValueAtTime(0, start);
+        channel.gain.linearRampToValueAtTime(1.0, start + duration / 8);
+        channel.gain.linearRampToValueAtTime(0.00001, start + duration);
+    }
+
     oscillator.start(start);
 
     oscillator.stop(start + duration);
@@ -102,7 +110,8 @@ const getInputSettings = () => {
         interval: parseInt(document.querySelector('#interval').value) || 400,
         slope: parseFloat(document.querySelector('#slope').value) || 0.0, // for nice sound 0.015
         thickness: parseInt(document.querySelector('#thickness').value) || 2,
-        lineHeight: parseInt(document.querySelector('#lineHeight').value) || 7
+        lineHeight: parseInt(document.querySelector('#lineHeight').value) || 7,
+        supressClick: true
     };
 };
 
