@@ -5,6 +5,10 @@ const master = context.createGain();
 master.connect(context.destination);
 
 document.querySelector('#start').addEventListener('click', async (e) => {
+    if (context.state === 'suspended') {
+        context.resume();
+    }
+
     e.target.disabled = true;
     const SETTINGS = getInputSettings();
     master.gain.setValueAtTime(1.0, 0);
@@ -49,12 +53,17 @@ document.querySelector('#stop').addEventListener('click', () => {
 });
 
 document.querySelector('#test').addEventListener('click', () => {
-    playFrequency(18000, 0, 1, 0);
+    if (context.state === 'suspended') {
+        context.resume();
+    }
+
+    playFrequency(20000, 0, 1, 0);
 });
 
 
 const playFrequency = (frequency, start, duration, slope, supressClick = true) => {
     duration = Math.floor(duration*frequency)/frequency;
+    start = context.currentTime + start;
 
     const oscillator = context.createOscillator();
     const channel = context.createGain();
@@ -71,8 +80,6 @@ const playFrequency = (frequency, start, duration, slope, supressClick = true) =
     oscillator.start(start);
 
     oscillator.stop(start + duration);
-
-    // setTimeout(() => { channel.gain.setTargetAtTime(0, context.currentTime, slope); }, duration * 1000);
 };
 
 const transpose = (array) => array[0].map((_, colIndex) => array.map(row => row[colIndex]));
